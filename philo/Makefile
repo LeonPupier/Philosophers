@@ -6,13 +6,13 @@
 #    By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/02 08:32:06 by lpupier           #+#    #+#              #
-#    Updated: 2023/01/06 14:42:11 by lpupier          ###   ########.fr        #
+#    Updated: 2023/01/12 15:37:28 by lpupier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # Constants
 NAME		=	philo
-CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra -Werror -pthread #-fsanitize=thread
 
 # Directories path
 DIR_SRCS	=	sources/
@@ -22,7 +22,9 @@ DIR_HEADERS	=	headers/
 HEADERS	=	$(DIR_HEADERS)philo.h
 
 SRCS	=	$(DIR_SRCS)main.c \
-			$(DIR_SRCS)errors.c
+			$(DIR_SRCS)ft_atoi.c \
+			$(DIR_SRCS)parameters.c \
+			$(DIR_SRCS)philosopher.c
 
 OBJS	=	$(SRCS:.c=.o)
 
