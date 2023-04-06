@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:37:15 by lpupier           #+#    #+#             */
-/*   Updated: 2023/01/17 13:05:07 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/06 18:10:28 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef struct s_philo {
 	int				activitie;
 	int				time;
 	int				time_backup;
+	int				time_reset;
 	int				time_to_eat;
 	int				nb_of_time_eat;
 	int				nb_max_eat;
@@ -63,6 +64,11 @@ typedef struct s_data {
 	struct timeval	init;
 }	t_data;
 
+// main.c
+
+int		main(int argc, char **argv);
+int		loop_of_life(t_data *data);
+
 // parameters.c
 
 int		check_errors(int argc, char **argv);
@@ -71,6 +77,8 @@ int		assign_data(t_data *data, int argc, char **argv);
 // philosopher.c
 
 void	text(t_philo *philo, char *str, char *color);
+int		waiting(t_philo *philo, int time_to_wait);
+void	routine(t_philo *philo);
 void	*philosopher(void *void_philo);
 
 // ft_atoi.c

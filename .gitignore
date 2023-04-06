@@ -1,3 +1,7 @@
-*.o
+.vscode/
+.objs/
+.nfs*
 *.a
+*.o
+*.txt
 philo/philo

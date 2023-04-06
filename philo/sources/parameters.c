@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 14:38:36 by lpupier           #+#    #+#             */
-/*   Updated: 2023/01/17 13:03:31 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/06 14:03:13 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int	assign_data(t_data *data, int argc, char **argv)
 	count = -1;
 	while (++count < data->nb_of_philo)
 	{
-		data->list_philo[count].id = count;
+		data->list_philo[count].id = count + 1;
 		data->list_philo[count].time_to_die = ft_atoi(argv[2]) * 1000;
 		data->list_philo[count].time_to_eat = ft_atoi(argv[3]) * 1000;
 		data->list_philo[count].time_to_sleep = ft_atoi(argv[4]) * 1000;

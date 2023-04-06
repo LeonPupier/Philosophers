@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 11:25:59 by lpupier           #+#    #+#             */
-/*   Updated: 2023/01/17 15:13:14 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/06 18:01:40 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,18 @@ void	text(t_philo *philo, char *str, char *color)
 
 int	waiting(t_philo *philo, int time_to_wait)
 {
-	if (philo->time > time_to_wait)
+	static int	begin_time;
+
+	if (!begin_time)
+		begin_time = philo->time;
+	if (philo->time - begin_time > time_to_wait)
 	{
 		if (philo->activitie == EATING)
 			philo->activitie = SLEEPING;
 		else if (philo->activitie == SLEEPING)
 			philo->activitie = EATING;
+		philo->is_waiting = 0;
+		begin_time = 0;
 		return (1);
 	}
 	return (0);
@@ -36,21 +42,17 @@ void	routine(t_philo *philo)
 	static int	time_to_wait;
 
 	if (philo->is_waiting)
-	{
-		if (waiting(philo, time_to_wait) == 1)
-			philo->is_waiting = 0;
-	}
+		waiting(philo, time_to_wait);
 	else if (philo->activitie == EATING)
 	{
-		//text(philo, "is thinking", YELLOW);
-		text(philo, "is eating", BLUE);
-		philo->time = 0;
+		text(philo, "is eating", GREEN);
+		philo->time_reset = philo->time_backup;
 		time_to_wait = philo->time_to_eat;
 		philo->is_waiting = 1;
 	}
 	else if (philo->activitie == SLEEPING)
 	{
-		text(philo, "is sleeping", GREEN);
+		text(philo, "is sleeping", YELLOW);
 		time_to_wait = philo->time_to_sleep;
 		philo->is_waiting = 1;
 	}
@@ -60,16 +62,23 @@ void	*philosopher(void *void_philo)
 {
 	t_philo			*philo;
 	struct timeval	current_time;
+	int				time_gap;
 
 	philo = (t_philo *)void_philo;
 	philo->activitie = SLEEPING;
-	while (philo->time <= philo->time_to_die)
+	gettimeofday(&current_time, NULL);
+	time_gap = current_time.tv_usec - philo->data->init.tv_usec;
+	philo->time_backup += time_gap;
+	philo->time_reset = 0;
+	text(philo, "is born", BLUE);
+	while (philo->time <= philo->time_to_die + time_gap)
 	{
 		gettimeofday(&current_time, NULL);
 		philo->time = (current_time.tv_sec - philo->data->init.tv_sec) \
-		* 1000000 + current_time.tv_usec - philo->data->init.tv_usec;
+		* 1000000 + current_time.tv_usec - philo->data->init.tv_usec \
+		+ time_gap - philo->time_reset;
 		philo->time_backup = (current_time.tv_sec - philo->data->init.tv_sec) \
-		* 1000000 + current_time.tv_usec - philo->data->init.tv_usec;
+		* 1000000 + current_time.tv_usec - philo->data->init.tv_usec + time_gap;
 		routine(philo);
 	}
 	text(philo, "died", RED);

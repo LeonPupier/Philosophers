@@ -6,13 +6,14 @@
 #    By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/02 08:32:06 by lpupier           #+#    #+#              #
-#    Updated: 2023/01/12 15:37:28 by lpupier          ###   ########.fr        #
+#    Updated: 2023/04/06 13:46:08 by lpupier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # Constants
 NAME		=	philo
 CFLAGS		=	-Wall -Wextra -Werror -pthread #-fsanitize=thread
+RM			=	rm -rf
 
 # Directories path
 DIR_SRCS	=	sources/
@@ -26,7 +27,9 @@ SRCS	=	$(DIR_SRCS)main.c \
 			$(DIR_SRCS)parameters.c \
 			$(DIR_SRCS)philosopher.c
 
-OBJS	=	$(SRCS:.c=.o)
+# Objects
+DIR_OBJS	=	.objs/
+OBJS		=	${patsubst %.c, ${DIR_OBJS}%.o, ${SRCS}}
 
 # Rules
 .PHONY :	all clean fclean re watermark
@@ -36,11 +39,15 @@ all :	 	${NAME}
 %.o: %.c	$(HEADERS) Makefile
 			$(CC) $(CFLAGS) -c $< -o $@
 
+${DIR_OBJS}%.o: %.c	${HEADERS}
+			@mkdir -p ${shell dirname $@}
+			${CC} ${CFLAGS} -c $< -o $@ -I ${DIR_HEADERS}
+
 ${NAME}:	${OBJS}
 			$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
-			${RM} ${OBJS}
+			${RM} ${OBJS} ${DIR_OBJS}
 
 fclean:		clean
 			${RM} ${NAME}
