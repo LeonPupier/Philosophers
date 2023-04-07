@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:33:58 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/06 18:10:40 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/07 15:08:54 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@ int	main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	if (assign_data(&data, argc, argv))
 		return (EXIT_FAILURE);
-	data.nb_forks = data.nb_of_philo;
+	data.time_to_die = ft_atoi(argv[2]) * 1000;
+	data.time_to_eat = ft_atoi(argv[3]) * 1000;
+	data.time_to_sleep = ft_atoi(argv[4]) * 1000;
+	pthread_mutex_init(&data.display_text, NULL);
 	gettimeofday(&data.init, NULL);
 	count = -1;
 	while (++count < data.nb_of_philo)
@@ -31,7 +34,6 @@ int	main(int argc, char **argv)
 		philosopher, (void *)&data.list_philo[count]);
 	}
 	loop_of_life(&data);
-	free(data.list_philo);
 	return (EXIT_SUCCESS);
 }
 
@@ -41,8 +43,9 @@ int	loop_of_life(t_data *data)
 
 	running = 1;
 	while (running)
-	{
 		(void)data;
-	}
+	destroy_all_mutex(data);
+	pthread_mutex_destroy(&data->display_text);
+	free(data->list_philo);
 	return (1);
 }

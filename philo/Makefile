@@ -6,7 +6,7 @@
 #    By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/02 08:32:06 by lpupier           #+#    #+#              #
-#    Updated: 2023/04/06 13:46:08 by lpupier          ###   ########.fr        #
+#    Updated: 2023/04/07 08:23:41 by lpupier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,8 @@ HEADERS	=	$(DIR_HEADERS)philo.h
 SRCS	=	$(DIR_SRCS)main.c \
 			$(DIR_SRCS)ft_atoi.c \
 			$(DIR_SRCS)parameters.c \
-			$(DIR_SRCS)philosopher.c
+			$(DIR_SRCS)philosopher.c \
+			$(DIR_SRCS)utils.c
 
 # Objects
 DIR_OBJS	=	.objs/
