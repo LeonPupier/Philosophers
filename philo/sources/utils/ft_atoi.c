@@ -6,18 +6,11 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 08:28:43 by lpupier           #+#    #+#             */
-/*   Updated: 2023/01/12 08:44:31 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/10 10:24:13 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../headers/philo.h"
-
-static int	ft_check_overflow(int sign)
-{
-	if (sign == -1)
-		return (0);
-	return (-1);
-}
+#include "../../includes/philo.h"
 
 static long long int	ft_conv(long long int res)
 {
@@ -35,9 +28,9 @@ static long long int	ft_conv(long long int res)
  * acronym meaning: ASCII to integer.
  * 
  * @param str The character string to convert.
- * @return (int) The result of the conversion.
+ * @return (long) The result of the conversion.
  */
-int	ft_atoi(const char *str)
+long	ft_atoi(const char *str)
 {
 	long long int	result;
 	int				idx;
@@ -46,8 +39,8 @@ int	ft_atoi(const char *str)
 	result = 0;
 	idx = 0;
 	sign = 1;
-	while (str[idx] == ' ' || (str[idx] >= 9 && str[idx] <= 13))
-		idx++;
+	if (!ft_strcmp(str, "-2147483648"))
+		return (-2147483648);
 	if (str[idx] == '+' || str[idx] == '-')
 	{	
 		if (str[idx] == '-')
@@ -56,10 +49,34 @@ int	ft_atoi(const char *str)
 	}
 	while (str[idx] && str[idx] >= '0' && str[idx] <= '9')
 	{
-		if (result != ((result * 10 + (str[idx] - 48)) / 10))
-			return (ft_check_overflow(sign));
+		if ((int)result != (((int)result * 10 + (str[idx] - 48)) / 10))
+			return (ATOI_OVERFLOW);
 		result = result * 10 + str[idx] - 48;
 		idx++;
 	}
-	return ((int)ft_conv(result * sign));
+	if (str[idx] || (str[idx - 1] < '0' || str[idx - 1] > '9'))
+		return (ATOI_OVERFLOW);
+	return ((long long)ft_conv(result * sign));
+}
+
+/**
+ * @brief Comparison function between two character strings.
+ * 
+ * @param s1 String to compare.
+ * @param s2 Character string to compare with [s1].
+ * @return (int) Returns 0 if the two strings are identical,
+ * the differences of their first character not common otherwise.
+ */
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	size_t	i;
+
+	i = 0;
+	while (s1[i] && s2[i])
+	{
+		if (s1[i] != s2[i])
+			break ;
+		i++;
+	}
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
