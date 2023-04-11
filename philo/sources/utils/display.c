@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 10:19:02 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/10 14:33:21 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/11 16:44:04 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,62 @@
  * @param philo Structure of philosopher (see includes/philo.h).
  * @param str	The character string displayed on the screen.
  * @param color	The color in which to display certain text elements.
+ * @return (int) returns 1 if the display has been performed, 0 otherwise.
  */
-void	text(t_philo *philo, char *str, char *color)
+int	text(t_philo *philo, char *str, char *color)
+{
+	pthread_mutex_lock(&philo->data->display_text);
+	if (philo->is_alive)
+	{
+		printf("%s%ld%s \e[1m%d\e[0m%s %s\n", color, philo->time \
+		- philo->data->init_time, color, philo->id, NC, str);
+		pthread_mutex_unlock(&philo->data->display_text);
+		return (1);
+	}
+	pthread_mutex_unlock(&philo->data->display_text);
+	return (0);
+}
+
+/**
+ * @brief Function allowing to display the project logs on the screen according
+ * to the model requested with the possibility of adding color.
+ * (Equivalent to the text() function without checking
+ * if the philosopher is alive or not.)
+ * 
+ * @param philo	Structure of philosopher (see includes/philo.h).
+ * @param str	The character string displayed on the screen.
+ * @param color	The color in which to display certain text elements.
+ * @return (int) Always returns 1.
+ */
+int	unsecure_text(t_philo *philo, char *str, char *color)
 {
 	pthread_mutex_lock(&philo->data->display_text);
 	printf("%s%ld%s \e[1m%d\e[0m%s %s\n", color, philo->time \
 	- philo->data->init_time, color, philo->id, NC, str);
 	pthread_mutex_unlock(&philo->data->display_text);
+	return (1);
+}
+
+/**
+ * @brief Function to display the end of program message if all
+ * the philosophers have eaten the number provided as an argument.
+ * 
+ * @param data General structure of the program (see includes/philo.h).
+ * @return (int) Returns EXIT_SUCCESS or EXIT_FAILURE.
+ */
+int	display_end_game(t_data *data)
+{
+	if (!data->nb_max_eat)
+		return (EXIT_FAILURE);
+	pthread_mutex_lock(&data->display_text);
+	if (data->nb_max_eat > 1)
+		printf("%s[END] All philosophers have eaten at least %d times.%s\n", \
+		RED, data->nb_max_eat, NC);
+	else
+		printf("%s[END] All philosophers have eaten at least %d time.%s\n", \
+		RED, data->nb_max_eat, NC);
+	pthread_mutex_unlock(&data->display_text);
+	return (EXIT_SUCCESS);
 }
 
 /**

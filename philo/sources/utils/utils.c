@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 11:10:17 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/10 18:41:54 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/11 15:56:49 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,28 +24,6 @@ long	get_time(void)
 
 	gettimeofday(&time, NULL);
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
-}
-
-/**
- * @brief Function of freeing program memory and deleting mutexes.
- * 
- * @param data General structure of the program (see includes/philo.h).
- */
-void	free_memory_and_mutex(t_data *data)
-{
-	int	idx;
-
-	idx = -1;
-	while (++idx < data->nb_of_philo)
-	{
-		pthread_mutex_lock(&data->list_philo[idx].access_philo);
-		data->list_philo[idx].is_alive = 0;
-		pthread_join(data->list_philo[idx].thread_id, NULL);
-		pthread_mutex_unlock(&data->list_philo[idx].access_philo);
-	}
-	destroy_all_mutex(data);
-	free(data->list_philo);
-	free(data->list_forks);
 }
 
 /**
@@ -73,4 +51,40 @@ int	check_everyone_eating_status(t_data *data)
 		pthread_mutex_unlock(&data->list_philo[idx].access_philo);
 	}
 	return (status);
+}
+
+/**
+ * @brief Function to kill all the philosophers following a death
+ * or a controlled shutdown of the program.
+ * 
+ * @param data General structure of the program (see includes/philo.h).
+ */
+void	declare_everyone_dead(t_data *data)
+{
+	int	idx;
+
+	idx = -1;
+	while (++idx < data->nb_of_philo)
+	{
+		pthread_mutex_lock(&data->list_philo[idx].access_philo);
+		data->list_philo[idx].is_alive = 0;
+		pthread_mutex_unlock(&data->list_philo[idx].access_philo);
+	}
+}
+
+/**
+ * @brief Function of freeing program memory and deleting mutexes.
+ * 
+ * @param data General structure of the program (see includes/philo.h).
+ */
+void	free_memory_and_mutex(t_data *data)
+{
+	int	idx;
+
+	idx = -1;
+	while (++idx < data->nb_of_philo)
+		pthread_join(data->list_philo[idx].thread_id, NULL);
+	destroy_all_mutex(data);
+	free(data->list_philo);
+	free(data->list_forks);
 }

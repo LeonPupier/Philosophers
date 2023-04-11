@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/07 08:22:24 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/10 18:35:07 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/11 15:56:14 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,11 +83,8 @@ void	destroy_all_mutex(t_data *data)
 	idx = -1;
 	while (++idx < data->nb_of_philo)
 	{
-		pthread_mutex_unlock(&data->list_forks[idx]);
 		pthread_mutex_destroy(&data->list_forks[idx]);
-		pthread_mutex_unlock(&data->list_philo[idx].access_philo);
 		pthread_mutex_destroy(&data->list_philo[idx].access_philo);
 	}
-	pthread_mutex_unlock(&data->display_text);
 	pthread_mutex_destroy(&data->display_text);
 }

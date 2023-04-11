@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:33:58 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/10 17:49:02 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/11 15:55:29 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,6 @@ int	main(int argc, char **argv)
 	init_all_mutex(&data);
 	launch_threads(&data);
 	loop_of_life(&data);
+	free_memory_and_mutex(&data);
 	return (EXIT_SUCCESS);
 }

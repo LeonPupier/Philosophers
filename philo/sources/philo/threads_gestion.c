@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 17:28:43 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/10 18:28:00 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/11 16:34:22 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,21 +50,23 @@ void	loop_of_life(t_data *data)
 	running = 1;
 	while (running)
 	{
+		if (check_everyone_eating_status(data))
+		{
+			if (data->nb_max_eat)
+				declare_everyone_dead(data);
+			running = display_end_game(data);
+		}
 		idx = -1;
 		while (++idx < data->nb_of_philo)
 		{
 			pthread_mutex_lock(&data->list_philo[idx].access_philo);
 			if (data->list_philo[idx].is_alive == 0)
 			{
-				text(&data->list_philo[idx], "died", RED);
-				running = 0;
+				unsecure_text(&data->list_philo[idx], "died", RED);
 				pthread_mutex_unlock(&data->list_philo[idx].access_philo);
-				break ;
+				return ;
 			}
 			pthread_mutex_unlock(&data->list_philo[idx].access_philo);
 		}
-		if (check_everyone_eating_status(data))
-			running = 0;
 	}
-	free_memory_and_mutex(data);
 }

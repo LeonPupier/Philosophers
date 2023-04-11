@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:37:15 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/10 18:27:06 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/11 16:37:57 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,15 +81,16 @@ typedef struct s_data {
 
 int		main(int argc, char **argv);
 
-// threads_gestion.c
-
-int		launch_threads(t_data *data);
-void	loop_of_life(t_data *data);
-
 // parameters.c
 
 int		check_errors(int argc, char **argv);
 int		assign_data(t_data *data, int argc, char **argv);
+void	assign_philo(t_data *data);
+
+// threads_gestion.c
+
+int		launch_threads(t_data *data);
+void	loop_of_life(t_data *data);
 
 // philosopher.c
 
@@ -104,7 +105,9 @@ int		waiting(t_philo *philo, long time_to_wait);
 
 // display.c
 
-void	text(t_philo *philo, char *str, char *color);
+int		text(t_philo *philo, char *str, char *color);
+int		unsecure_text(t_philo *philo, char *str, char *color);
+int		display_end_game(t_data *data);
 void	display_rules(void);
 int		display_error(int code);
 
@@ -118,8 +121,9 @@ void	destroy_all_mutex(t_data *data);
 // utils.c
 
 long	get_time(void);
-void	free_memory_and_mutex(t_data *data);
 int		check_everyone_eating_status(t_data *data);
+void	declare_everyone_dead(t_data *data);
+void	free_memory_and_mutex(t_data *data);
 
 // ft_atoi.c
 

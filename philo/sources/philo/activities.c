@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 17:34:09 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/10 18:28:54 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/11 14:40:25 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,25 @@
  * 
  * @param philo Structure of philosopher (see includes/philo.h).
  * @return (long) Returns the waiting time a philosopher takes to eat.
+ * 0 if the philosopher is supposed to be dead between two function calls.
  */
 long	eating(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->access_philo);
+	if (!philo->is_alive)
+		return (pthread_mutex_unlock(&philo->access_philo), 0);
 	text(philo, "is thinking", BLUE);
+	pthread_mutex_unlock(&philo->access_philo);
 	lock_forks_to_eat(philo);
 	philo->time = get_time();
 	philo->time_backup = philo->time;
 	if (philo->time - philo->time_backup > philo->data->time_to_die)
-		return (0);
+		return (unlock_forks_to_eat(philo), 0);
 	text(philo, "is eating", GREEN);
 	pthread_mutex_lock(&philo->access_philo);
 	philo->nb_of_time_eat++;
-	pthread_mutex_unlock(&philo->access_philo);
 	philo->is_waiting = 1;
+	pthread_mutex_unlock(&philo->access_philo);
 	return (philo->data->time_to_eat);
 }
 
@@ -39,10 +44,15 @@ long	eating(t_philo *philo)
  * 
  * @param philo Structure of philosopher (see includes/philo.h).
  * @return (long) Returns the waiting time a philosopher takes to eat.
+ * 0 if the philosopher is supposed to be dead between two function calls.
  */
 long	sleeping(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->access_philo);
+	if (!philo->is_alive)
+		return (pthread_mutex_unlock(&philo->access_philo), 0);
 	text(philo, "is sleeping", YELLOW);
+	pthread_mutex_unlock(&philo->access_philo);
 	philo->is_waiting = 1;
 	return (philo->data->time_to_sleep);
 }
@@ -63,7 +73,10 @@ int	waiting(t_philo *philo, long time_to_wait)
 	{
 		if (philo->activitie == EATING)
 		{
-			unlock_forks_to_eat(philo);
+			pthread_mutex_lock(&philo->access_philo);
+			if (philo->is_alive)
+				unlock_forks_to_eat(philo);
+			pthread_mutex_unlock(&philo->access_philo);
 			philo->activitie = SLEEPING;
 		}
 		else if (philo->activitie == SLEEPING)
