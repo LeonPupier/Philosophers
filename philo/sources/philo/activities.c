@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 17:34:09 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/11 14:40:25 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/14 10:32:12 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,17 @@ long	eating(t_philo *philo)
 	pthread_mutex_lock(&philo->access_philo);
 	if (!philo->is_alive)
 		return (pthread_mutex_unlock(&philo->access_philo), 0);
-	text(philo, "is thinking", BLUE);
+	if (!text(philo, "is thinking", BLUE))
+		return (pthread_mutex_unlock(&philo->access_philo), 0);
 	pthread_mutex_unlock(&philo->access_philo);
 	lock_forks_to_eat(philo);
+	philo->is_waiting = 1;
+	pthread_mutex_lock(&philo->access_philo);
 	philo->time = get_time();
 	philo->time_backup = philo->time;
-	if (philo->time - philo->time_backup > philo->data->time_to_die)
-		return (unlock_forks_to_eat(philo), 0);
-	text(philo, "is eating", GREEN);
-	pthread_mutex_lock(&philo->access_philo);
+	if (!text(philo, "is eating", GREEN))
+		return (pthread_mutex_unlock(&philo->access_philo), 0);
 	philo->nb_of_time_eat++;
-	philo->is_waiting = 1;
 	pthread_mutex_unlock(&philo->access_philo);
 	return (philo->data->time_to_eat);
 }
@@ -49,9 +49,8 @@ long	eating(t_philo *philo)
 long	sleeping(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->access_philo);
-	if (!philo->is_alive)
+	if (!text(philo, "is sleeping", YELLOW))
 		return (pthread_mutex_unlock(&philo->access_philo), 0);
-	text(philo, "is sleeping", YELLOW);
 	pthread_mutex_unlock(&philo->access_philo);
 	philo->is_waiting = 1;
 	return (philo->data->time_to_sleep);
@@ -74,13 +73,13 @@ int	waiting(t_philo *philo, long time_to_wait)
 		if (philo->activitie == EATING)
 		{
 			pthread_mutex_lock(&philo->access_philo);
-			if (philo->is_alive)
-				unlock_forks_to_eat(philo);
+			unlock_forks_to_eat(philo);
 			pthread_mutex_unlock(&philo->access_philo);
 			philo->activitie = SLEEPING;
 		}
 		else if (philo->activitie == SLEEPING)
 			philo->activitie = EATING;
+		philo->time_to_wait = 0;
 		philo->is_waiting = 0;
 		philo->time_begin = 0;
 		return (1);

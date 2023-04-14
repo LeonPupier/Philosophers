@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 14:38:36 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/11 16:28:43 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/12 13:24:34 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	check_errors(int argc, char **argv)
 	error = 0;
 	if (argc != 5 && argc != 6)
 		error = display_error(WRONG_NUMBER);
-	if (ft_atoi(argv[1]) > 256)
+	if (argc > 1 && ft_atoi(argv[1]) > 256)
 		error = display_error(TOO_MANY_PHILO);
 	count = 0;
 	while (++count < argc)
@@ -93,5 +93,7 @@ void	assign_philo(t_data *data)
 		data->list_philo[idx].is_waiting = 0;
 		data->list_philo[idx].is_alive = 1;
 		data->list_philo[idx].nb_of_time_eat = 0;
+		data->list_philo[idx].time_begin = 0;
+		data->list_philo[idx].time_to_wait = 0;
 	}
 }

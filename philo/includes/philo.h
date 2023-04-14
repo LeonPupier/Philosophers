@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:37:15 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/11 16:37:57 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/14 13:32:33 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ enum e_errors {
 	WRONG_NUMBER,
 	TOO_MANY_PHILO,
 	BAD_CONVERSION,
-	MALLOC_ERROR
+	MALLOC_ERROR,
+	THREAD_ERROR
 };
 
 // Activities
@@ -116,6 +117,7 @@ int		display_error(int code);
 void	init_all_mutex(t_data *data);
 void	lock_forks_to_eat(t_philo *philo);
 void	unlock_forks_to_eat(t_philo *philo);
+void	unlock_forks_as_needed(t_philo *philo);
 void	destroy_all_mutex(t_data *data);
 
 // utils.c

@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 11:10:17 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/11 15:56:49 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/14 08:18:19 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,24 +31,30 @@ long	get_time(void)
  * the minimum number of times if the mode is active.
  * 
  * @param data General structure of the program (see includes/philo.h).
- * @return (int) Returns 1 if all the philosophers have eaten
- * the minimum number of times. 0 otherwise or if the mode is not active. 
+ * @return (int) Returns EXIT_SUCCESS if all the philosophers have eaten
+ * the minimum number of times.
+ * EXIT_FAILURE otherwise or if the mode is not active. 
  */
 int	check_everyone_eating_status(t_data *data)
 {
 	int	idx;
 	int	status;
 
-	status = 1;
+	status = EXIT_SUCCESS;
 	idx = -1;
 	if (!data->nb_max_eat)
-		return (0);
+		return (EXIT_FAILURE);
 	while (++idx < data->nb_of_philo)
 	{
 		pthread_mutex_lock(&data->list_philo[idx].access_philo);
 		if (data->list_philo[idx].nb_of_time_eat < data->nb_max_eat)
-			status = 0;
+			status = EXIT_FAILURE;
 		pthread_mutex_unlock(&data->list_philo[idx].access_philo);
+	}
+	if (status == EXIT_SUCCESS)
+	{
+		declare_everyone_dead(data);
+		display_end_game(data);
 	}
 	return (status);
 }

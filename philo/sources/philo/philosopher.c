@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 11:25:59 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/11 16:33:47 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/14 13:31:01 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,14 @@ void	*philosopher(void *void_philo)
 	t_philo	*philo;
 
 	philo = (t_philo *)void_philo;
-	if (philo->id > 1)
-		usleep(5);
 	philo->time_backup = get_time();
 	while (1)
 	{
 		pthread_mutex_lock(&philo->access_philo);
 		if (!philo->is_alive)
 			break ;
-		pthread_mutex_unlock(&philo->access_philo);
 		philo->time = get_time();
+		pthread_mutex_unlock(&philo->access_philo);
 		if (philo->time - philo->time_backup <= philo->data->time_to_die)
 			routine(philo);
 		else
@@ -43,6 +41,7 @@ void	*philosopher(void *void_philo)
 			pthread_mutex_unlock(&philo->access_philo);
 		}
 	}
+	unlock_forks_as_needed(philo);
 	pthread_mutex_unlock(&philo->access_philo);
 	return (NULL);
 }
