@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 14:38:36 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/12 13:24:34 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/20 14:28:29 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,16 @@ int	check_errors(int argc, char **argv)
 	error = 0;
 	if (argc != 5 && argc != 6)
 		error = display_error(WRONG_NUMBER);
-	if (argc > 1 && ft_atoi(argv[1]) > 256)
-		error = display_error(TOO_MANY_PHILO);
+	if (argc > 1 && ft_atoi(argv[1]) > 200)
+		display_error(TOO_MANY_PHILO);
 	count = 0;
 	while (++count < argc)
 	{
 		number = ft_atoi(argv[count]);
 		if (number == ATOI_OVERFLOW || number < 1)
 			error = display_error(BAD_CONVERSION);
+		else if ((count >= 2 && count <= 4) && number < 60)
+			display_error(TIME_TOO_LOW);
 	}
 	if (error)
 		return (display_rules(), EXIT_FAILURE);
@@ -73,6 +75,7 @@ int	assign_data(t_data *data, int argc, char **argv)
 		return (display_error(MALLOC_ERROR), EXIT_FAILURE);
 	}
 	assign_philo(data);
+	data->is_alive = 1;
 	return (EXIT_SUCCESS);
 }
 
@@ -88,12 +91,11 @@ void	assign_philo(t_data *data)
 	idx = -1;
 	while (++idx < data->nb_of_philo)
 	{
-		data->list_philo[idx].id = idx + 1;
+		data->list_philo[idx].id = idx;
 		data->list_philo[idx].activitie = EATING;
-		data->list_philo[idx].is_waiting = 0;
-		data->list_philo[idx].is_alive = 1;
 		data->list_philo[idx].nb_of_time_eat = 0;
 		data->list_philo[idx].time_begin = 0;
 		data->list_philo[idx].time_to_wait = 0;
+		data->list_philo[idx].data = data;
 	}
 }

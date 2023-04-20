@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 10:19:02 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/14 10:57:40 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/20 14:28:02 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,18 @@
  */
 int	text(t_philo *philo, char *str, char *color)
 {
-	pthread_mutex_lock(&philo->data->display_text);
-	if (!philo->is_alive)
-		return (pthread_mutex_unlock(&philo->data->display_text), 0);
-	printf("%s%ld%s \e[1m%d\e[0m%s %s\n", color, philo->time \
-	- philo->data->init_time, color, philo->id, NC, str);
-	pthread_mutex_unlock(&philo->data->display_text);
+	philo->time = get_time();
+	if (philo->time - philo->time_backup >= philo->data->time_to_die)
+		return (0);
+	pthread_mutex_lock(&philo->data->data_mutex);
+	if (!philo->data->is_alive)
+	{
+		pthread_mutex_unlock(&philo->data->data_mutex);
+		return (0);
+	}
+	printf("%s%ld%s \e[1m%d\e[0m%s %s\n", color, get_time() \
+	- philo->data->init_time, color, philo->id + 1, NC, str);
+	pthread_mutex_unlock(&philo->data->data_mutex);
 	return (1);
 }
 
@@ -36,20 +42,16 @@ int	text(t_philo *philo, char *str, char *color)
  * @brief Function allowing to display the project logs on the screen according
  * to the model requested with the possibility of adding color.
  * (Equivalent to the text() function without checking
- * if the philosopher is alive or not).
+ * if the philosopher is alive or not and the data mutex.
  * 
  * @param philo	Structure of philosopher (see includes/philo.h).
  * @param str	The character string displayed on the screen.
  * @param color	The color in which to display certain text elements.
- * @return (int) Always returns 1.
  */
-int	unsecure_text(t_philo *philo, char *str, char *color)
+void	unsecure_text(t_philo *philo, char *str, char *color)
 {
-	pthread_mutex_lock(&philo->data->display_text);
-	printf("%s%ld%s \e[1m%d\e[0m%s %s\n", color, philo->time \
-	- philo->data->init_time, color, philo->id, NC, str);
-	pthread_mutex_unlock(&philo->data->display_text);
-	return (1);
+	printf("%s%ld%s \e[1m%d\e[0m%s %s\n", color, get_time() \
+	- philo->data->init_time, color, philo->id + 1, NC, str);
 }
 
 /**
@@ -63,14 +65,14 @@ int	display_end_game(t_data *data)
 {
 	if (!data->nb_max_eat)
 		return (0);
-	pthread_mutex_lock(&data->display_text);
+	pthread_mutex_lock(&data->data_mutex);
 	if (data->nb_max_eat > 1)
 		printf("%s[END] All philosophers have eaten at least %d times.%s\n", \
 		RED, data->nb_max_eat, NC);
 	else
 		printf("%s[END] All philosophers have eaten at least %d time.%s\n", \
 		RED, data->nb_max_eat, NC);
-	pthread_mutex_unlock(&data->display_text);
+	pthread_mutex_unlock(&data->data_mutex);
 	return (1);
 }
 
@@ -102,7 +104,9 @@ int	display_error(int code)
 	if (code == WRONG_NUMBER)
 		printf("%s[ERROR] Wrong number of arguments.%s\n", RED, NC);
 	else if (code == TOO_MANY_PHILO)
-		printf("%s[ERROR] Too many philosophers (> 256).%s\n", RED, NC);
+		printf("%s[WARNING] Too many philosophers (> 200).%s\n", RED, NC);
+	else if (code == TIME_TOO_LOW)
+		printf("%s[WARNING] Time too small (< 60ms).%s\n", RED, NC);
 	else if (code == BAD_CONVERSION)
 	{
 		printf("%s[ERROR] Overflow, negative or null ", RED);

@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 11:25:59 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/14 13:31:01 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/20 16:30:16 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,21 @@ void	*philosopher(void *void_philo)
 	t_philo	*philo;
 
 	philo = (t_philo *)void_philo;
+	init_forks_of_philo(philo);
+	wait_all_philo_come_alive(philo);
 	philo->time_backup = get_time();
-	while (1)
+	while (philo->nb_of_time_eat < philo->data->nb_max_eat \
+	|| !philo->data->nb_max_eat)
 	{
-		pthread_mutex_lock(&philo->access_philo);
-		if (!philo->is_alive)
-			break ;
-		philo->time = get_time();
-		pthread_mutex_unlock(&philo->access_philo);
-		if (philo->time - philo->time_backup <= philo->data->time_to_die)
-			routine(philo);
-		else
+		if (!routine(philo))
 		{
-			pthread_mutex_lock(&philo->access_philo);
-			philo->is_alive = 0;
-			pthread_mutex_unlock(&philo->access_philo);
+			end_simulation_by_death(philo);
+			break ;
 		}
 	}
-	unlock_forks_as_needed(philo);
-	pthread_mutex_unlock(&philo->access_philo);
+	fork_gestion_with_one_meal(philo);
+	if (philo->time_to_wait && philo->activitie == EATING)
+		unlock_forks_to_eat(philo);
 	return (NULL);
 }
 
@@ -51,13 +47,45 @@ void	*philosopher(void *void_philo)
  * he can Eat, Sleep and Think.
  * 
  * @param philo Structure of philosopher (see includes/philo.h).
+ * @return (int) Returns 1 if the routine went well, 0 otherwise.
  */
-void	routine(t_philo *philo)
+int	routine(t_philo *philo)
 {
-	if (philo->is_waiting)
-		waiting(philo, philo->time_to_wait);
-	else if (philo->activitie == EATING)
-		philo->time_to_wait = eating(philo);
-	else if (philo->activitie == SLEEPING)
-		philo->time_to_wait = sleeping(philo);
+	if (philo->time_to_wait)
+	{
+		if (!waiting(philo))
+			return (0);
+	}
+	else
+	{
+		if (philo->activitie == EATING)
+			philo->time_to_wait = eating(philo);
+		else if (philo->activitie == SLEEPING)
+			philo->time_to_wait = sleeping(philo);
+		if (!philo->time_to_wait)
+			return (0);
+	}
+	return (1);
+}
+
+/**
+ * @brief Function to make a philosopher wait if the number of meals
+ * he had to eat is 1 so that the following do not eat too quickly.
+ * 
+ * @param philo Structure of philosopher (see includes/philo.h).
+ * @return (int) Returns 1 if the philosopher had to distribute his forks well,
+ * 0 if he did not need them.
+ */
+int	fork_gestion_with_one_meal(t_philo *philo)
+{
+	if (philo->data->nb_max_eat == 1)
+	{
+		while (philo->time_to_wait)
+		{
+			philo->time = get_time();
+			waiting(philo);
+		}
+		return (1);
+	}
+	return (0);
 }

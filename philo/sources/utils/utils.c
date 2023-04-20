@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 11:10:17 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/14 08:18:19 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/20 16:39:46 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,55 +27,40 @@ long	get_time(void)
 }
 
 /**
- * @brief Functions to check if all the philosophers have eaten
- * the minimum number of times if the mode is active.
+ * @brief Function serving as a wait for all the philosophers as long as they
+ * are not all launched to avoid the lag.
  * 
- * @param data General structure of the program (see includes/philo.h).
- * @return (int) Returns EXIT_SUCCESS if all the philosophers have eaten
- * the minimum number of times.
- * EXIT_FAILURE otherwise or if the mode is not active. 
+ * @param philo Structure of philosopher (see includes/philo.h).
  */
-int	check_everyone_eating_status(t_data *data)
+void	wait_all_philo_come_alive(t_philo *philo)
 {
-	int	idx;
-	int	status;
-
-	status = EXIT_SUCCESS;
-	idx = -1;
-	if (!data->nb_max_eat)
-		return (EXIT_FAILURE);
-	while (++idx < data->nb_of_philo)
+	while (1)
 	{
-		pthread_mutex_lock(&data->list_philo[idx].access_philo);
-		if (data->list_philo[idx].nb_of_time_eat < data->nb_max_eat)
-			status = EXIT_FAILURE;
-		pthread_mutex_unlock(&data->list_philo[idx].access_philo);
+		pthread_mutex_lock(&philo->data->data_mutex);
+		if (philo->data->init_time)
+			break ;
+		pthread_mutex_unlock(&philo->data->data_mutex);
 	}
-	if (status == EXIT_SUCCESS)
-	{
-		declare_everyone_dead(data);
-		display_end_game(data);
-	}
-	return (status);
+	pthread_mutex_unlock(&philo->data->data_mutex);
+	if (philo->id % 2)
+		usleep(15000);
 }
 
 /**
- * @brief Function to kill all the philosophers following a death
- * or a controlled shutdown of the program.
+ * @brief Function to declare the end of the simulation by telling the other
+ * philosophers that they must kill themselves and display the first death.
  * 
- * @param data General structure of the program (see includes/philo.h).
+ * @param philo Structure of philosopher (see includes/philo.h).
  */
-void	declare_everyone_dead(t_data *data)
+void	end_simulation_by_death(t_philo *philo)
 {
-	int	idx;
-
-	idx = -1;
-	while (++idx < data->nb_of_philo)
+	pthread_mutex_lock(&philo->data->data_mutex);
+	if (philo->data->is_alive)
 	{
-		pthread_mutex_lock(&data->list_philo[idx].access_philo);
-		data->list_philo[idx].is_alive = 0;
-		pthread_mutex_unlock(&data->list_philo[idx].access_philo);
+		philo->data->is_alive = 0;
+		unsecure_text(philo, "died", RED);
 	}
+	pthread_mutex_unlock(&philo->data->data_mutex);
 }
 
 /**
@@ -85,12 +70,7 @@ void	declare_everyone_dead(t_data *data)
  */
 void	free_memory_and_mutex(t_data *data)
 {
-	int	idx;
-
-	idx = -1;
-	while (++idx < data->nb_of_philo)
-		pthread_join(data->list_philo[idx].thread_id, NULL);
 	destroy_all_mutex(data);
-	free(data->list_philo);
 	free(data->list_forks);
+	free(data->list_philo);
 }

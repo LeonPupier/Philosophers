@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:37:15 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/14 13:32:33 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/20 14:17:55 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # define GREEN	"\e[32m"
 # define BLUE	"\e[34m"
 # define YELLOW	"\e[33m"
+# define PINK	"\e[95m"
 # define NC		"\e[0m"
 
 // Errors status
@@ -37,7 +38,8 @@ enum e_errors {
 	TOO_MANY_PHILO,
 	BAD_CONVERSION,
 	MALLOC_ERROR,
-	THREAD_ERROR
+	THREAD_ERROR,
+	TIME_TOO_LOW
 };
 
 // Activities
@@ -56,18 +58,18 @@ typedef struct s_philo {
 	int				id;
 	int				activitie;
 	int				nb_of_time_eat;
-	int				is_waiting;
-	int				is_alive;
 	long			time;
 	long			time_backup;
 	long			time_begin;
 	long			time_to_wait;
-	pthread_mutex_t	access_philo;
+	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	*right_fork;
 }	t_philo;
 
 // Main structure
 typedef struct s_data {
 	int				nb_of_philo;
+	int				is_alive;
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				time_to_die;
@@ -75,7 +77,7 @@ typedef struct s_data {
 	long			init_time;
 	t_philo			*list_philo;
 	pthread_mutex_t	*list_forks;
-	pthread_mutex_t	display_text;
+	pthread_mutex_t	data_mutex;
 }	t_data;
 
 // main.c
@@ -90,24 +92,25 @@ void	assign_philo(t_data *data);
 
 // threads_gestion.c
 
-int		launch_threads(t_data *data);
-void	loop_of_life(t_data *data);
+void	launch_threads(t_data *data);
+void	wait_end_simulation(t_data *data);
 
 // philosopher.c
 
 void	*philosopher(void *void_philo);
-void	routine(t_philo *philo);
+int		routine(t_philo *philo);
+int		fork_gestion_with_one_meal(t_philo *philo);
 
 // activities.c
 
 long	eating(t_philo *philo);
 long	sleeping(t_philo *philo);
-int		waiting(t_philo *philo, long time_to_wait);
+int		waiting(t_philo *philo);
 
 // display.c
 
 int		text(t_philo *philo, char *str, char *color);
-int		unsecure_text(t_philo *philo, char *str, char *color);
+void	unsecure_text(t_philo *philo, char *str, char *color);
 int		display_end_game(t_data *data);
 void	display_rules(void);
 int		display_error(int code);
@@ -115,16 +118,16 @@ int		display_error(int code);
 // mutex.c
 
 void	init_all_mutex(t_data *data);
-void	lock_forks_to_eat(t_philo *philo);
+void	init_forks_of_philo(t_philo *philo);
+int		lock_forks_to_eat(t_philo *philo);
 void	unlock_forks_to_eat(t_philo *philo);
-void	unlock_forks_as_needed(t_philo *philo);
 void	destroy_all_mutex(t_data *data);
 
 // utils.c
 
 long	get_time(void);
-int		check_everyone_eating_status(t_data *data);
-void	declare_everyone_dead(t_data *data);
+void	wait_all_philo_come_alive(t_philo *philo);
+void	end_simulation_by_death(t_philo *philo);
 void	free_memory_and_mutex(t_data *data);
 
 // ft_atoi.c
