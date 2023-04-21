@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:37:15 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/20 14:17:55 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/21 08:51:57 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void	assign_philo(t_data *data);
 
 // threads_gestion.c
 
-void	launch_threads(t_data *data);
+int		launch_threads(t_data *data);
 void	wait_end_simulation(t_data *data);
 
 // philosopher.c

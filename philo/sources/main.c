@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:33:58 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/20 13:31:47 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/21 08:52:51 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,14 @@ int	main(int argc, char **argv)
 	if (assign_data(&data, argc, argv))
 		return (EXIT_FAILURE);
 	init_all_mutex(&data);
-	launch_threads(&data);
-	wait_end_simulation(&data);
+	if (!launch_threads(&data))
+	{
+		pthread_mutex_lock(&data.data_mutex);
+		data.is_alive = 0;
+		pthread_mutex_unlock(&data.data_mutex);
+	}
+	else
+		wait_end_simulation(&data);
 	free_memory_and_mutex(&data);
 	return (EXIT_SUCCESS);
 }

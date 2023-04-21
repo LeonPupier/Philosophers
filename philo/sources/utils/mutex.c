@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/07 08:22:24 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/20 16:48:23 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/21 08:47:29 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,13 @@ void	init_forks_of_philo(t_philo *philo)
 	if (philo->id % 2 == 1)
 	{
 		philo->left_fork = &philo->data->list_forks[philo->id];
-		philo->right_fork = &philo->data->list_forks[(philo->id + 1) % philo->data->nb_of_philo];
+		philo->right_fork = &philo->data->list_forks[\
+		(philo->id + 1) % philo->data->nb_of_philo];
 	}
 	else
 	{
-		philo->left_fork = &philo->data->list_forks[(philo->id + 1) % philo->data->nb_of_philo];
+		philo->left_fork = &philo->data->list_forks[\
+		(philo->id + 1) % philo->data->nb_of_philo];
 		philo->right_fork = &philo->data->list_forks[philo->id];
 	}
 }
