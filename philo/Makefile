@@ -6,13 +6,13 @@
 #    By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/02 08:32:06 by lpupier           #+#    #+#              #
-#    Updated: 2023/04/21 09:06:44 by lpupier          ###   ########.fr        #
+#    Updated: 2023/04/21 09:46:51 by lpupier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # Constants
 NAME		=	philo
-CFLAGS		=	-Wall -Wextra -Werror -pthread -fsanitize=thread
+CFLAGS		=	-Wall -Wextra -Werror -pthread -fsanitize=thread -g3
 RM			=	rm -rf
 
 # Directories path
