@@ -6,7 +6,7 @@
 /*   By: lpupier <lpupier@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 11:10:17 by lpupier           #+#    #+#             */
-/*   Updated: 2023/04/21 09:51:02 by lpupier          ###   ########.fr       */
+/*   Updated: 2023/04/21 10:12:38 by lpupier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,9 @@ void	wait_all_philo_come_alive(t_philo *philo)
 		pthread_mutex_unlock(&philo->data->data_mutex);
 	}
 	pthread_mutex_unlock(&philo->data->data_mutex);
+	text(philo, "is thinking", BLUE);
+	if (philo->id % 2)
+		usleep(15000);
 }
 
 /**
