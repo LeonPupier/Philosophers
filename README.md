@@ -1,6 +1,6 @@
 # Philosophers
 
-This project was completed as part of the curriculum at École 42. The goal of the project is to simulate the behavior of philosophers who eat spaghetti and reflect between bites. The project is written in C and implements a solution to the dining philosophers problem using threads and semaphores.
+This project was completed as part of the curriculum at École 42. The goal of the project is to simulate the behavior of philosophers who eat spaghetti and reflect between bites. The project is written in C and implements a solution to the dining philosophers problem using threads and semaphores. 
 
 ## Installation
 
